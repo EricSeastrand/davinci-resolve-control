@@ -1,5 +1,13 @@
 import pyautogui
 
+from ui_interactor.utility import calc_center_point
+
+input_coords = {
+    'L': 30,
+    'R': 20
+}
+
+x,y = calc_center_point(input_coords)
 
 hdr_wheels = "UiMainWindow.bigBossWidget.widgetStack_Panel.WStackPage_Color.m_pColorPanel.frameVerticalContainer.frameColorBottom.frameColorBottomToolsContainer.m_pFrameBottomMain.UiPrimaryWidgetContainer.BorderFrame.frameTabWidgetBorder.stackedWidget.colorHDRTab.colorWheelTopFrame.btnWheelsView"
 
@@ -21,12 +29,6 @@ hdr_coords = {
 	'B': 1658
 }
 
-def calc_center_point(coords):
-	w = coords['R'] - coords['L']
-	h = coords['B'] - coords['T']
-	x = coords['R'] - (w / 2)
-	y = coords['B'] - (h / 2)
-	return [x, y]
 
 primaries_xy = calc_center_point(primaries_coords)
 hdr_xy = calc_center_point(hdr_coords)
