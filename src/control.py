@@ -1,40 +1,43 @@
-import pyautogui
+from application_connector import ApplicationConnector
 
-from ui_interactor.utility import calc_center_point
+from ui_interactor.element_map import ElementMap, ElementNotFoundException
+from ui_interactor.element import Element
 
-input_coords = {
-    'L': 30,
-    'R': 20
+process_descriptor = {
+	'title_re': "DaVinci Resolve.*?",
+	#'process': pid
 }
 
-x,y = calc_center_point(input_coords)
+print("Initializing application")
+connector = ApplicationConnector(
+	process_descriptor = process_descriptor,
+)
+connector.start()
 
-hdr_wheels = "UiMainWindow.bigBossWidget.widgetStack_Panel.WStackPage_Color.m_pColorPanel.frameVerticalContainer.frameColorBottom.frameColorBottomToolsContainer.m_pFrameBottomMain.UiPrimaryWidgetContainer.BorderFrame.frameTabWidgetBorder.stackedWidget.colorHDRTab.colorWheelTopFrame.btnWheelsView"
+print("Loading element map")
+element_map = ElementMap(
+	element_list = connector.elements
+)
+retriever_function = element_map.make_retriever_function()
 
-# L120, T1628, R179, B1658
-primaries_tab = "UiMainWindow.bigBossWidget.widgetStack_Panel.WStackPage_Color.m_pColorPanel.frameVerticalContainer.frameColorBottom.frameColorBottomToolbar.frameColorBottomToolbarButtons.btnColorWheels"
-primaries_coords = {
-	'L': 120,
-	'T': 1628,
-	'R': 179,
-	'B': 1658
-}
+print("Initializing button controllers")
+activate_tab_primaries = Element(
+	automation_id = "UiMainWindow.bigBossWidget.widgetStack_Panel.WStackPage_Color.m_pColorPanel.frameVerticalContainer.frameColorBottom.frameColorBottomToolbar.frameColorBottomToolbarButtons.btnColorWheels",
+	retriever_function = retriever_function
+)
 
-# L180, T1628, R239, B1658
-hdr_tab = "UiMainWindow.bigBossWidget.widgetStack_Panel.WStackPage_Color.m_pColorPanel.frameVerticalContainer.frameColorBottom.frameColorBottomToolbar.frameColorBottomToolbarButtons.btnHdr"
-hdr_coords = {
-	'L': 180,
-	'T': 1628,
-	'R': 239,
-	'B': 1658
-}
+activate_tab_hdr = Element(
+	automation_id = "UiMainWindow.bigBossWidget.widgetStack_Panel.WStackPage_Color.m_pColorPanel.frameVerticalContainer.frameColorBottom.frameColorBottomToolbar.frameColorBottomToolbarButtons.btnHdr",
+	retriever_function = retriever_function
+)
 
+print("Clicking buttons")
 
-primaries_xy = calc_center_point(primaries_coords)
-hdr_xy = calc_center_point(hdr_coords)
-#print(primaries_coords)
-#print(primaries_xy)
+from time import sleep
 
-pyautogui.click(*primaries_xy)
-
-pyautogui.click(*hdr_xy)
+for i in range(1, 11):
+	print("HDR")
+	activate_tab_hdr.get_pointer().click()
+	sleep(.5)
+	print("Primaries")
+	activate_tab_primaries.get_pointer().click()

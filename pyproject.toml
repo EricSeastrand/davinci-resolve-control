@@ -6,6 +6,9 @@ build-backend = "hatchling.build"
 name = "davinci_resolve_control"
 
 [tool.pytest.ini_options]
+markers = [
+    "integration: Requires DaVinci Resolve application running, slow."
+]
 addopts = [
     "--import-mode=importlib",
 ]

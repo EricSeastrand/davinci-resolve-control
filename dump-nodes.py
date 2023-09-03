@@ -24,66 +24,70 @@ import pprint
 
 window = app.window(class_name="UiMainWindowImp")
 #pprint.pprint(window)
-window.dump_tree(filename='dump-nodes.txt')
+#window.dump_tree(filename='dump-nodes.txt')
 
-app_root = "UiMainWindow.bigBossWidget"
+elements = window.descendants()
 
-# # hdr_button = get_element_by_id_path(hdr, window)
-
-# hdr_button = window.child_window(
-# 	auto_id=hdr,
-# 	control_type="CheckBox",
-# )
-# print(hdr_button)
-# print(hdr_button.handle)
-
-# #primaries_button = get_element_by_id_path(primaries, window)
-# primaries_button = window.child_window(
-# 	auto_id=primaries,
-# 	control_type="CheckBox",
-# )
-# print(primaries_button)
-# print(primaries_button.handle)
+primaries_tab = "UiMainWindow.bigBossWidget.widgetStack_Panel.WStackPage_Color.m_pColorPanel.frameVerticalContainer.frameColorBottom.frameColorBottomToolbar.frameColorBottomToolbarButtons.btnColorWheels"
+hdr_tab = "UiMainWindow.bigBossWidget.widgetStack_Panel.WStackPage_Color.m_pColorPanel.frameVerticalContainer.frameColorBottom.frameColorBottomToolbar.frameColorBottomToolbarButtons.btnHdr"
 
 
+elements_data = []
+for element in elements:
+	properties = element.get_properties()
+	elements_data.append(properties)
 
-# print("Click HDR")
-# hdr_button.click_input()
-
-# print("Click Primaries")
-# primaries_button.click_input()
-
-# print("Click HDR")
-# hdr_button.click_input()
-
-# print("Click Primaries")
-# primaries_button.click_input()
-
-
-
-# def get_element_by_id_path(path, window):
-# 	parts = path.split('.')
-# 	path_so_far = ''
-# 	for part in parts:
-# 		if part == 'UiMainWindow':
-# 			continue
+	if properties['automation_id'] == primaries_tab:
+		print("FOUND PRIMARIES!")
+		primaries_btn = element
 		
-# 		path_so_far += part
-		
-# 		print("Looking for:"+part)
-# 		look_for = 'UiMainWindow.' +path_so_far
-# 		print(look_for)
-# 		from pywinauto.findwindows import find_elements
-# 		elements = find_elements(
-# 			parent=window,
-# 			process=pid,
-# 			auto_id=look_for
-# 		)
-# 		path_so_far += "."
+	if properties['automation_id'] == hdr_tab:
+		print("FOUND HDR_BTN!")
+		hdr_btn = element
 
-# 		if len(elements) < 1:
-# 			raise Exception("No Elements Found for path: "+look_for)
+print(primaries_btn)
+print(hdr_btn)
 
-# 		window = elements[0]
+from time import sleep
 
-# 	return window
+print("primaries_btn clicking")
+primaries_btn.click()
+print("primaries_btn clicked")
+
+sleep(.1)
+print("hdr_btn clicking")
+hdr_btn.click()
+print("hdr_btn clicked")
+
+sleep(.1)
+print("primaries_btn clicking")
+primaries_btn.click()
+print("primaries_btn clicked")
+
+sleep(.1)
+print("hdr_btn clicking")
+hdr_btn.click()
+print("hdr_btn clicked")
+
+sleep(.1)
+print("primaries_btn clicking")
+primaries_btn.click()
+print("primaries_btn clicked")
+
+sleep(.1)
+print("hdr_btn clicking")
+hdr_btn.click()
+print("hdr_btn clicked")
+
+sleep(.1)
+
+# app_root_id = "UiMainWindow.bigBossWidget"
+
+# app_root = window.child_window(
+# 	auto_id=app_root_id
+# )
+
+# elements = app_root.find_elements()
+
+# print(elements)
+
