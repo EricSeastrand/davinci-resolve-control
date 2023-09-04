@@ -4,7 +4,7 @@ from ui_interactor.element import Element
 id_to_test_with = 'a.totally.real.id'
 
 def retriever_function(element_instance):
-	return "I'm a reference to something IRL"
+	return { "pointer": "I'm a reference to something IRL", "properties": {'foo': 'bar'}}
 
 @pytest.fixture
 def element_instance():
@@ -28,7 +28,7 @@ def test_element_gets_pointer_from_retriever(element_instance):
 	element_instance.get_pointer() == expected_reference
 
 def test_element_caches_pointer(element_instance):
-	fake_pointer = "A pointer, if this was real"
+	fake_pointer = {"pointer": "A pointer, if this was real", "properties": {'foo': 'bar'}}
 	attempted_retrievals = 0
 	def retriever_function(_unused):
 		nonlocal attempted_retrievals, fake_pointer
@@ -38,9 +38,9 @@ def test_element_caches_pointer(element_instance):
 	element_instance.retriever_function = retriever_function
 
 	retrieved_pointer = element_instance.get_pointer()
-	assert retrieved_pointer == fake_pointer, "Element didn't get our fake pointer"
+	assert retrieved_pointer == fake_pointer['pointer'], "Element didn't get our fake pointer"
 
 	retrieved_pointer = element_instance.get_pointer()
-	assert retrieved_pointer == fake_pointer, "Element didn't return our fake pointer the second time around"
+	assert retrieved_pointer == fake_pointer['pointer'], "Element didn't return our fake pointer the second time around"
 
 	assert attempted_retrievals == 1, "Element should have called retriever function exactly 1 time."

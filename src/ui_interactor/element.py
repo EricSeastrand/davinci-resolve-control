@@ -6,10 +6,13 @@ class Element(object):
 		self.automation_id = automation_id
 		self.retriever_function = retriever_function
 		self._pointer = None
+		self._properties = None
 
 	def get_pointer(self):
 		if not self._pointer:
-			self._pointer = self.retriever_function(self)
+			retrieved = self.retriever_function(self)
+			self._pointer = retrieved['pointer']
+			self._properties = retrieved['properties']
 
 		return self._pointer
 	

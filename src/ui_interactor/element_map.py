@@ -20,8 +20,7 @@ class ElementMap(object):
 	def make_retriever_function(self):
 		def retriever_function(dependent_element):
 			nonlocal self
-			lookup_result = self.lookup(dependent_element.automation_id)
-			return lookup_result['pointer']
+			return self.lookup(automation_id=dependent_element.automation_id)
 
 		return retriever_function
 
