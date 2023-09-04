@@ -84,7 +84,8 @@ def go_to_gain_global():
 
 def go_to_gain_color():
 	activate_tab_primaries.get_pointer().click()
-	gain_color_ball.get_pointer().move_mouse_input(absolute=False)
+	xy = gain_color_ball.get_pointer().rectangle().mid_point()
+	gain_color_ball.get_pointer().move_mouse_input(coords=xy)
 
 
 #descendants = exposure_slider.get_pointer().descendants()
