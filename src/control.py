@@ -1,4 +1,5 @@
 import IPython
+from time import sleep
 
 from application_connector import ApplicationConnector
 
@@ -87,6 +88,67 @@ def go_to_gain_color():
 	xy = gain_color_ball.get_pointer().rectangle().mid_point()
 	gain_color_ball.get_pointer().move_mouse_input(coords=xy)
 
+def gain_color_adjust(x, y):
+	drag_mouse_relative(gain_color_ball, x, y)
+
+
+state = {
+	'action': None,
+}
+def update_mouse_state():
+	x,y = pyautogui.position()
+	state['x'] = x
+	state['y'] = y
+
+def drag_start(x,y):
+	if is_dragging():
+		return
+
+	pyautogui.moveTo(x,y)
+	update_mouse_state()
+	state['action'] = 'drag'
+	state['drag_start'] = [x,y]
+	pyautogui.mouseDown()
+
+def is_dragging():
+	return state['action'] == 'drag'
+
+def do_drag(x,y):
+	state['x'] = state['x'] + x
+	state['y'] = state['y'] + y
+	pyautogui.moveTo(state['x'], state['y'])
+
+def drag_stop():
+	pyautogui.mouseUp()
+	state['action'] = None
+
+def drag_mouse_relative(element, x, y):
+	pywinautocontroller = element.get_pointer()
+	press_coords = pywinautocontroller.rectangle().mid_point()
+
+	if press_coords[0] == 0 and press_coords[1] == 0:
+		print("Can't get coords right now.")
+		print(element)
+		return;
+
+	button = 'left'
+	pressed= ''
+	release_coords = [press_coords[0] + x , press_coords[1] + y]
+	absolute=True
+	print(press_coords)
+	print(release_coords)
+
+	drag_start(press_coords[0], press_coords[1])
+	
+	do_drag(x, y)
+
+		#pywinautocontroller.press_mouse_input(button, press_coords, pressed, absolute=absolute)
+	
+	#
+	#
+	#pywinautocontroller.release_mouse_input(button, release_coords, pressed, absolute=absolute)
+
+
 
 #descendants = exposure_slider.get_pointer().descendants()
 # In [11]: descendants[4].get_properties()
@@ -107,6 +169,63 @@ def go_to_gain_color():
 # print(exposure_slider)
 #
 #colorwheel = element_map.lookup("UiMainWindow.bigBossWidget.widgetStack_Panel.WStackPage_Color.m_pColorPanel.frameVerticalContainer.frameColorBottom.frameColorBottomToolsContainer.m_pFrameBottomMain.UiPrimaryWidgetContainer.BorderFrame.frameTabWidgetBorder.stackedWidget.colorWheelsTab.colorWheelsMainContainer.colorWheelsSplitter.colorWheelsStackedWidget.threeWayColorWidget.primaryTopHoldFrame.groupBoxGain.gainWheel")
+
+from midi.controller import Controller
+from midi.message import Message
+
+controller = Controller(input_id=2)
+
+import pyautogui
+pyautogui.PAUSE = 0
+pyautogui.FAILSAFE = False
+
+
+
+
+
+def on_message(raw_message, timing):
+	print(raw_message)
+	message = Message(raw_message)
+
+	print(message.summary())
+
+	if message.type == 'button' and message.control_id==1 and message.button_state == 'down':
+		go_to_hdr_exposure()
+
+	if message.type == 'button' and message.control_id==2 and message.button_state == 'down':
+		go_to_gain_color()
+
+
+
+	if message.type == 'dial' and (message.control_id==2 or message.control_id==3):
+		sensitivity = 1
+		if message.direction == 'up':
+			amount = sensitivity
+		if message.direction == 'down':
+			amount = -sensitivity
+
+		#pointer = gain_color_ball.get_pointer()
+		
+		
+
+		if message.control_id == 2:
+			gain_color_adjust(amount, 0)
+		if message.control_id == 3:
+			gain_color_adjust(0, amount)
+		
+		
+		#pointer.click_input(button='move', coords=coords, absolute=False, pressed="")
+		
+
+def on_message_with_reload(raw_message, timing):
+	try:
+		on_message(raw_message, timing)
+	except ElementNotFoundException:
+		print("Could not find element. Will try a refresh.")
+		refresh_element_map()
+		on_message(raw_message, timing)
+
+controller.start_loop(on_message_with_reload)
 
 
 IPython.embed()
