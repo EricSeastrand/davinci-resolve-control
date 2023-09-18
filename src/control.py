@@ -89,66 +89,10 @@ def go_to_gain_color():
 	gain_color_ball.get_pointer().move_mouse_input(coords=xy)
 
 def gain_color_adjust(x, y):
-	drag_mouse_relative(gain_color_ball, x, y)
+	mouse_drag.drag_on_element(gain_color_ball, x, y)
 
-
-state = {
-	'action': None,
-}
-def update_mouse_state():
-	x,y = pyautogui.position()
-	state['x'] = x
-	state['y'] = y
-
-def drag_start(x,y):
-	if is_dragging():
-		return
-
-	pyautogui.moveTo(x,y)
-	update_mouse_state()
-	state['action'] = 'drag'
-	state['drag_start'] = [x,y]
-	pyautogui.mouseDown()
-
-def is_dragging():
-	return state['action'] == 'drag'
-
-def do_drag(x,y):
-	state['x'] = state['x'] + x
-	state['y'] = state['y'] + y
-	pyautogui.moveTo(state['x'], state['y'])
-
-def drag_stop():
-	pyautogui.mouseUp()
-	state['action'] = None
-
-def drag_mouse_relative(element, x, y):
-	pywinautocontroller = element.get_pointer()
-	press_coords = pywinautocontroller.rectangle().mid_point()
-
-	if press_coords[0] == 0 and press_coords[1] == 0:
-		print("Can't get coords right now.")
-		print(element)
-		return;
-
-	button = 'left'
-	pressed= ''
-	release_coords = [press_coords[0] + x , press_coords[1] + y]
-	absolute=True
-	print(press_coords)
-	print(release_coords)
-
-	drag_start(press_coords[0], press_coords[1])
-	
-	do_drag(x, y)
-
-		#pywinautocontroller.press_mouse_input(button, press_coords, pressed, absolute=absolute)
-	
-	#
-	#
-	#pywinautocontroller.release_mouse_input(button, release_coords, pressed, absolute=absolute)
-
-
+def hdr_exposure_adjust(x):
+	mouse_drag.drag_on_element(exposure_slider, x, 0)
 
 #descendants = exposure_slider.get_pointer().descendants()
 # In [11]: descendants[4].get_properties()
@@ -175,11 +119,9 @@ from midi.message import Message
 
 controller = Controller(input_id=2)
 
-import pyautogui
-pyautogui.PAUSE = 0
-pyautogui.FAILSAFE = False
+from ui_interactor.mouse_drag import MouseDrag
 
-
+mouse_drag = MouseDrag()
 
 
 
@@ -195,7 +137,10 @@ def on_message(raw_message, timing):
 	if message.type == 'button' and message.control_id==2 and message.button_state == 'down':
 		go_to_gain_color()
 
-
+	if message.type == 'dial' and message.control_id==1:
+		sensitivity = 1
+		direction = -1 if message.direction == 'down' else 1
+		hdr_exposure_adjust(sensitivity * direction)
 
 	if message.type == 'dial' and (message.control_id==2 or message.control_id==3):
 		sensitivity = 1
@@ -223,7 +168,7 @@ def on_message_with_reload(raw_message, timing):
 	except ElementNotFoundException:
 		print("Could not find element. Will try a refresh.")
 		refresh_element_map()
-		on_message(raw_message, timing)
+		#on_message(raw_message, timing)
 
 controller.start_loop(on_message_with_reload)
 
