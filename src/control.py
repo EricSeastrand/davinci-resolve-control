@@ -117,7 +117,11 @@ def hdr_exposure_adjust(x):
 from midi.controller import Controller
 from midi.message import Message
 
-controller = Controller(input_id=2)
+midi_input_id = 2
+
+
+controller = Controller(input_id=midi_input_id)
+
 
 from ui_interactor.mouse_drag import MouseDrag
 

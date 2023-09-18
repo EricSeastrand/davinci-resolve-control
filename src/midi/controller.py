@@ -8,7 +8,13 @@ class Controller:
 		self.midi_input = MidiIn()
 		self.keep_listening = False
 
-		self.init_connection()
+		try:
+			self.init_connection()
+		except:
+			print(f"Can't open midi controller connection id:{input_id}. Check list..")
+			self.get_ports()
+			raise Exception("Can't find midi controller.")
+
 
 	def init_connection(self):
 		self.port = self.midi_input.open_port(port=self.input_id)
